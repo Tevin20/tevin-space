@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      UserRole @default(VIEWER)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  auditLogs AdminAuditLog[]
+
+  @@index([email])
+  @@index([active])
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  slug          String   @unique
+  price         Float
+  previousPrice Float?
+  rating        Float?   @default(0)
+  reviewCount   Int      @default(0)
+  image         String?
+  active        Boolean  @default(true)
+  featured      Boolean  @default(false)
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  affiliateLink AffiliateLink?
+  clicks        Click[]
+  featuredDeals FeaturedDeal[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([active])
+  @@index([featured])
+  @@index([createdAt])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  emoji     String?
+  slug      String   @unique
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+
+  @@index([active])
+  @@index([order])
+}
+
+model AffiliateLink {
+  id           String   @id @default(cuid())
+  productId    String   @unique
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url          String
+  active       Boolean  @default(true)
+  clickCount   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  clicks Click[]
+
+  @@index([productId])
+  @@index([active])
+}
+
+model Click {
+  id              String   @id @default(cuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  affiliateLinkId String
+  affiliateLink   AffiliateLink @relation(fields: [affiliateLinkId], references: [id], onDelete: Cascade)
+  timestamp       DateTime @default(now())
+  userAgent       String?
+  referer         String?
+  ipHash          String?
+  deviceType      DeviceType @default(UNKNOWN)
+  source          String?   @default("direct")
+  sessionId       String?
+  featured        Boolean  @default(false)
+
+  @@index([productId])
+  @@index([timestamp])
+  @@index([source])
+  @@index([deviceType])
+}
+
+enum DeviceType {
+  MOBILE
+  TABLET
+  DESKTOP
+  UNKNOWN
+}
+
+model SocialLink {
+  id        String   @id @default(cuid())
+  platform  String   @unique
+  name      String
+  url       String
+  icon      String?
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active])
+  @@index([order])
+}
+
+model FeaturedDeal {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  startDate    DateTime
+  endDate      DateTime?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([productId])
+  @@index([active])
+  @@index([startDate])
+}
+
+model SiteSettings {
+  id                  String   @id @default(cuid())
+  name                String   @default("Tevin Space")
+  description         String   @default("The stuff worth clicking on.")
+  avatarUrl           String?
+  bio                 String?
+  bioHandle           String   @default("@tevinspace")
+  seoTitle            String   @default("Tevin Space - Curated Deals & Gear")
+  seoDescription      String   @default("Curated deals and gear I actually use. Affiliate links.")
+  ogTitle             String?
+  ogDescription       String?
+  ogImage             String?
+  affiliateDisclosure String   @default("Some links on Tevin Space are affiliate links. I may earn a commission if you purchase through them, at no extra cost to you.")
+  favicon             String?
+  updatedAt           DateTime @updatedAt
+}
+
+model AdminAuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String
+  changes   String?  @db.Text
+  timestamp DateTime @default(now())
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([action])
+}

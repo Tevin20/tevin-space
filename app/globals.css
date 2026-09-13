@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Heading styles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Body text */
+p,
+span,
+a {
+  font-weight: 500;
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid #ff6b00;
+  outline-offset: 2px;
+}
+
+/* Remove default focus for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Bubble wrap button base styles */
+.bubble-btn {
+  position: relative;
+  background: linear-gradient(135deg, #ff6b00 0%, #e55a00 100%);
+  border: none;
+  border-radius: 50px;
+  padding: 12px 24px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3), inset -2px -2px 4px rgba(0, 0, 0, 0.2);
+  font-size: 16px;
+}
+
+.bubble-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), transparent);
+  border-radius: 50px;
+  pointer-events: none;
+}
+
+.bubble-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 107, 0, 0.4), inset -2px -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.bubble-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(255, 107, 0, 0.3), inset 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 2s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
