@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
     
     const body = await request.json();
     const validatedData = ProductSchema.parse(body);
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     // Log audit
     await prisma.adminAuditLog.create({
       data: {
-        userId: (await requireAdmin()).id,
+        userId: admin.id,
         action: 'CREATE_PRODUCT',
         entity: 'Product',
         entityId: product.id,
