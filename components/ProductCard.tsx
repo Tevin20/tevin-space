@@ -1,9 +1,9 @@
-import { Product } from '@prisma/client';
+import { Product, Category } from '@prisma/client';
 import Link from 'next/link';
 import { formatPrice, getDiscountPercentage } from '@/lib/utils';
 
 interface ProductCardProps {
-  product: Product & { category: any };
+  product: Product & { category: Category };
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
